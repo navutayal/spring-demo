@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <context:component-scan base-package="com.example"/>
+
+    <jee:jndi-lookup id="config_ds" jndi-name="jdbc/oracle" expected-type="javax.sql.DataSource"/>
+
+    <mvc:annotation-driven/>
+
+    <security:http auto-config="true">
+        <security:intercept-url pattern="/" access="permitAll"/>
+        <security:intercept-url pattern="/admin**" access="hasRole('ADMIN')"/>
+        <security:intercept-url pattern="/dba**" access="hasRole('ADMIN') and hasRole('DBA')"/>
+    </security:http>
+
+    <security:authentication-manager>
+        <security:authentication-provider>
+            <security:user-service>
+                <security:user name="user" password="{noop}user" authorities="ROLE_USER"/>
+                <security:user name="admin" password="{noop}admin" authorities="ROLE_ADMIN"/>
+                <security:user name="dba" password="{noop}dba" authorities="ROLE_ADMIN,ROLE_DBA"/>
+            </security:user-service>
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+</beans>
